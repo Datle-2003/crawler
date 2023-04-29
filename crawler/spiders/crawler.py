@@ -5,7 +5,6 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
 import time
 import re
-# from scrapy.selector import Selector
 import scrapy
 
 
@@ -22,7 +21,7 @@ class FptShopSpider(scrapy.Spider):
         self.option.add_argument('--no-sandbox')
         self.option.add_argument('--disable-dev-shm-usage')
         self.option.add_argument("--incognito")
-        self.browser = webdriver.Chrome('/usr/bin/google-chrome',options=self.option)
+        self.browser = webdriver.Chrome(options=self.option)
         super(FptShopSpider, self).__init__()
 
     def convert_price(self, price_txt):
