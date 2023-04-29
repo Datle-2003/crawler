@@ -33,6 +33,6 @@ jobs:
           sudo chmod +x /usr/local/bin/chromedriver
           
       - name: Install all necessary packages
-        run: pip install -r requirements.txt
+        run: pip install -r psycopg2 urllib3 python-dotenv selenium scrapy
       - name: Run crawler
         run: python crawler/main.py
