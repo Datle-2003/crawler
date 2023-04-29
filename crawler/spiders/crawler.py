@@ -18,8 +18,11 @@ class FptShopSpider(scrapy.Spider):
         self.option = webdriver.ChromeOptions()
         self.option.add_experimental_option(
             'excludeSwitches', ['enable-logging'])
+        self.option.add_argument('--headless')
+        self.option.add_argument('--no-sandbox')
+        self.option.add_argument('--disable-dev-shm-usage')
         self.option.add_argument("--incognito")
-        self.browser = webdriver.Chrome(options=self.option)
+        self.browser = webdriver.Chrome('/usr/bin/google-chrome',options=self.option)
         super(FptShopSpider, self).__init__()
 
     def convert_price(self, price_txt):
