@@ -44,10 +44,11 @@ class FptShopSpider(scrapy.Spider):
     # click the show more button repeatly to load the entire content
         while True:
             try:
-                show_more_button = WebDriverWait(self.browser, 10).until(EC.element_to_be_clickable(
+                show_more_button = WebDriverWait(self.browser, 30).until(EC.element_to_be_clickable(
                     (By.XPATH, '//*[@id="root"]/main/div/div[3]/div[2]/div[3]/div/div[3]/a')))
                 show_more_button.click()
             except TimeoutException:
+                print('cant show more button')
                 break
 
     # parse the loaded content
