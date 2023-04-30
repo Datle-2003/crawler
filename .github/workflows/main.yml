@@ -10,23 +10,23 @@ on:
 
 jobs:
   crawl:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     steps:
-      - name: Check out this repo
+      - name: Checkout this repo
         uses: actions/checkout@v2
       - name: Download Chrome
         run: |
-          curl https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb --output chrome.deb
+          curl https://dl.google.com/tag/s/appguid%3D%7B8A69D345-D564-463C-AFF1-A69D9E530F96%7D%26iid%3D%7B8C6947B3-E6B3-F6DC-8E67-ECF3E3F3C362%7D%26lang%3Den%26browser%3D4%26usagestats%3D0%26appname%3DGoogle%2520Chrome%26needsadmin%3Dprefers%26ap%3Dx64-stable%26installdataindex%3Ddefaultbrowser/current/install/chrome/installer/ChromeStandaloneSetup.exe -o chrome.exe
       - name: Install Chrome
         run: |
-          sudo dpkg -i chrome.deb || sudo apt-get install -yf
+          ./chrome.exe /silent /install
       - name: Download Chrome Driver
         run: |
-          wget https://chromedriver.storage.googleapis.com/LATEST_RELEASE
-          export LATEST=$(cat LATEST_RELEASE)
-          wget https://chromedriver.storage.googleapis.com/$LATEST/chromedriver_linux64.zip
-          unzip chromedriver_linux64.zip
+          Invoke-WebRequest https://chromedriver.storage.googleapis.com/LATEST_RELEASE -OutFile latest.txt
+          $latest = Get-Content -Path latest.txt
+          Invoke-WebRequest "https://chromedriver.storage.googleapis.com/$($latest)/chromedriver_win32.zip" -OutFile chromedriver.zip
+          Expand-Archive -Path chromedriver.zip -DestinationPath .
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
