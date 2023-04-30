@@ -9,9 +9,11 @@ while True:
 
     # Check the exit status
     if status == 0:
+        print('success')
         # The command succeeded, so break out of the loop
         break
     else:
+        print('error')
         # The command failed, so wait for a bit and try again
         time.sleep(10)
 
