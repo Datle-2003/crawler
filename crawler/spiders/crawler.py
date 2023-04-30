@@ -20,7 +20,6 @@ class FptShopSpider(scrapy.Spider):
         self.option.add_argument('--headless')
         self.option.add_argument('--no-sandbox')
         self.option.add_argument('--disable-dev-shm-usage')
-        self.option.add_argument("--incognito")
         self.browser = webdriver.Chrome(options=self.option)
         super(FptShopSpider, self).__init__()
 
