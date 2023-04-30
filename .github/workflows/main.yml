@@ -15,18 +15,19 @@ jobs:
     steps:
       - name: Check out this repo
         uses: actions/checkout@v2
-      - name: Download Chrome
+      - name: Download Firefox
         run: |
-          curl https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb --output chrome.deb
-      - name: Install Chrome
+          sudo apt-get update && sudo apt-get install -y firefox
+      - name: Download Geckodriver
         run: |
-          sudo dpkg -i chrome.deb || sudo apt-get install -yf
-      - name: Download Chrome Driver
-        run: |
-          wget https://chromedriver.storage.googleapis.com/LATEST_RELEASE
-          export LATEST=$(cat LATEST_RELEASE)
-          wget https://chromedriver.storage.googleapis.com/$LATEST/chromedriver_linux64.zip
-          unzip chromedriver_linux64.zip
+          wget https://github.com/mozilla/geckodriver/releases/download/v0.30.0/geckodriver-v0.30.0-linux64.tar.gz
+          tar xzvf geckodriver-v0.30.0-linux64.tar.gz
+      - name: Set up Firefox
+        uses: nanasess/setup-geckodriver@v2.0.0
+        with:
+          geckodriver-version: "v0.30.0"
+          geckodriver-path: ./geckodriver
+
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
