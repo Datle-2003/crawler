@@ -6,6 +6,8 @@ from selenium.common.exceptions import TimeoutException
 import time
 import re
 import scrapy
+from selenium.webdriver import Firefox
+from selenium.webdriver.firefox.options import Options
 
 
 class FptShopSpider(scrapy.Spider):
@@ -14,13 +16,11 @@ class FptShopSpider(scrapy.Spider):
     start_urls = ['https://fptshop.com.vn/may-tinh-xach-tay']
 
     def __init__(self):
-        self.option = webdriver.ChromeOptions()
-        self.option.add_experimental_option(
-            'excludeSwitches', ['enable-logging'])
-        self.option.add_argument('--headless')
+        self.option = Options()
+        self.option.headless = True
         self.option.add_argument('--no-sandbox')
         self.option.add_argument('--disable-dev-shm-usage')
-        self.browser = webdriver.Chrome(options=self.option)
+        self.browser = Firefox(options=self.option)
         super(FptShopSpider, self).__init__()
 
     def convert_price(self, price_txt):
