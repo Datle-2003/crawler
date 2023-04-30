@@ -17,16 +17,18 @@ jobs:
         uses: actions/checkout@v2
       - name: Download Chrome
         run: |
-          curl https://dl.google.com/tag/s/appguid%3D%7B8A69D345-D564-463C-AFF1-A69D9E530F96%7D%26iid%3D%7B8C6947B3-E6B3-F6DC-8E67-ECF3E3F3C362%7D%26lang%3Den%26browser%3D4%26usagestats%3D0%26appname%3DGoogle%2520Chrome%26needsadmin%3Dprefers%26ap%3Dx64-stable%26installdataindex%3Ddefaultbrowser/current/install/chrome/installer/ChromeStandaloneSetup.exe -o chrome.exe
+          Invoke-WebRequest "https://dl.google.com/tag/s/appguid%3D%7B8A69D345-D564-463C-AFF1-A69D9E530F96%7D%26iid%3D%7B8C6947B3-E6B3-F6DC-8E67-ECF3E3F3C362%7D%26lang%3Den%26browser%3D4%26usagestats%3D0%26appname%3DGoogle%2520Chrome%26needsadmin%3Dprefers%26ap%3Dx64-stable%26installdataindex%3Ddefaultbrowser/current/install/chrome/installer/ChromeStandaloneSetup.exe" -OutFile "chrome.exe"
+          Start-Process .\chrome.exe -ArgumentList "/silent /install" -Wait
       - name: Install Chrome
         run: |
           ./chrome.exe /silent /install
       - name: Download Chrome Driver
         run: |
-          Invoke-WebRequest https://chromedriver.storage.googleapis.com/LATEST_RELEASE -OutFile latest.txt
-          $latest = Get-Content -Path latest.txt
-          Invoke-WebRequest "https://chromedriver.storage.googleapis.com/$($latest)/chromedriver_win32.zip" -OutFile chromedriver.zip
-          Expand-Archive -Path chromedriver.zip -DestinationPath .
+          Invoke-WebRequest "https://chromedriver.storage.googleapis.com/LATEST_RELEASE" -OutFile "latest.txt"
+          $latest = Get-Content -Path "latest.txt"
+          Invoke-WebRequest "https://chromedriver.storage.googleapis.com/$($latest)/chromedriver_win32.zip" -OutFile "chromedriver.zip"
+          Expand-Archive -Path "chromedriver.zip" -DestinationPath "."
+
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
