@@ -13,10 +13,9 @@ class FptShopSpider(scrapy.Spider):
     allowed_domains = ['https://fptshop.com.vn']
     start_urls = ['https://fptshop.com.vn/may-tinh-xach-tay']
 
-      def __init__(self):
+    def __init__(self):
         self.option = webdriver.ChromeOptions()
-        self.option.add_experimental_option(
-            'excludeSwitches', ['enable-logging'])
+        self.option.add_experimental_option('excludeSwitches', ['enable-logging'])
         self.option.add_argument('--headless')
         self.option.add_argument('--no-sandbox')
         self.option.add_argument('--disable-dev-shm-usage')
