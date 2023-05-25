@@ -41,14 +41,14 @@ class FptShopSpider(scrapy.Spider):
         self.browser.get(response.url)
         time.sleep(5)
     # click the show more button repeatly to load the entire content
-#         while True:
-#             try:
-#                 show_more_button = WebDriverWait(self.browser, 30).until(EC.element_to_be_clickable(
-#                     (By.XPATH, '//*[@id="root"]/main/div/div[3]/div[2]/div[3]/div/div[3]/a')))
-#                 show_more_button.click()
-#             except TimeoutException:
-#                 print('cant show more button')
-#                 break
+        while True:
+            try:
+                show_more_button = WebDriverWait(self.browser, 30).until(EC.element_to_be_clickable(
+                    (By.XPATH, '//*[@id="root"]/main/div/div[3]/div[2]/div[3]/div/div[3]/a')))
+                show_more_button.click()
+            except TimeoutException:
+                print('cant show more button')
+                break
 
     # parse the loaded content
         try:
@@ -264,3 +264,183 @@ class HoangHaMobileSpider(scrapy.Spider):
 
     def closed(self, reason):
         self.browser.quit()
+        
+        
+class AnPhatPCSpider(scrapy.Spider):
+    name = 'anphatpc'
+    start_urls = ['https://www.anphatpc.com.vn/laptop-theo-hang.html']
+
+    def __init__(self):
+        self.option = webdriver.ChromeOptions()
+        self.option.add_experimental_option('excludeSwitches', ['enable-logging'])
+        self.option.add_argument("--incognito")
+        self.browser = webdriver.Chrome(options=self.option)
+        super(FptShopSpider, self).__init__()
+
+    def convert_price(self, price_txt):
+        price_txt = re.sub(r"[^\d]", "", price_txt)
+        if not re.search(r"\d", price_txt):
+            return 0
+        return int(price_txt)
+
+    def parse(self, response):
+        brand_links = response.css('#js-filter-height table tbody tr:nth-child(1) td:nth-child(2) div a::attr(href)').getall()
+
+        for brand_link in brand_links:
+            yield response.follow(brand_link, callback=self.parse_brand)
+
+    def parse_brand(self, response):
+        raw_infos = response.css('section div.product-list-container.bg-white div.p-list-container.d-flex.flex-wrap div.p-text')
+
+        for raw_info in raw_infos:
+            name = raw_info.css('a h3::text').get()
+            price = raw_info.css('div.price-container span.p-price::text').get()
+            link = raw_info.css('a::attr(href)').get()
+
+            name = name.strip() if name else None
+            price = self.convert_price(price) if price else 0
+
+            yield {
+                'website': 'anphatpc',
+                'name': name,
+                'price': price,
+                'link': link
+            }
+    def closed(self, reason):
+        self.browser.quit()
+
+        
+        
+        
+       
+class HacomSpider(scrapy.Spider):
+    name = 'hacom'
+    start_urls = ['https://hacom.vn/laptop']
+
+    def __init__(self):
+        self.option = webdriver.ChromeOptions()
+        self.option.add_experimental_option('excludeSwitches', ['enable-logging'])
+        self.option.add_argument("--incognito")
+        self.browser = webdriver.Chrome(options=self.option)
+        super(FptShopSpider, self).__init__()
+
+    def convert_price(self, price_txt):
+        price_txt = re.sub(r"[^\d]", "", price_txt)
+        if not re.search(r"\d", price_txt):
+            return 0
+        return int(price_txt)
+
+    def parse(self, response):
+        urls = [response.urljoin(f'{response.url}/{i + 1}/') for i in range(10)]
+
+        for url in urls:
+            yield scrapy.Request(url, callback=self.parse_page)
+
+    def parse_page(self, response):
+        links = response.css('#159 div[data-pid] a::attr(href)').getall()
+        names = response.css('#159 div[data-pid] a::text').getall()
+        prices = response.css('#159 div[data-pid] span.price::text').getall()
+
+        prices = [self.convert_price(price) for price in prices]
+
+        for name, link, price in zip(names, links, prices):
+            yield {
+                'name': name,
+                'link': link,
+                'price': price,
+            }
+
+    def closed(self, reason):
+        self.browser.quit()
+
+class NguyenKimSpider(scrapy.Spider):
+    name = 'nguyenkim'
+    start_urls = ['https://www.nguyenkim.com/laptop-may-tinh-xach-tay']
+
+    custom_settings = {
+        'DOWNLOAD_DELAY': 1,
+        'CONCURRENT_REQUESTS': 1,
+        'ROBOTSTXT_OBEY': False,
+        'USER_AGENT': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.182 Safari/537.36',
+    }
+
+    def convert_price(self, price_txt):
+        price_txt = re.sub(r"[^\d]", "", price_txt)
+        if not re.search(r"\d", price_txt):
+            return 0
+        return int(price_txt)
+
+    def parse(self, response):
+        urls = [f'{response.url}/page-{i + 1}/' for i in range(4)]
+
+        for url in urls:
+            yield scrapy.Request(url, callback=self.parse_page)
+
+    def parse_page(self, response):
+        links = response.css('div.item h3 a::attr(href)').getall()
+        names = response.css('div.item h3 a::text').getall()
+        prices = response.css('div.item span.price strong::text').getall()
+
+        prices = [self.convert_price(price) for price in prices]
+
+        for name, link, price in zip(names, links, prices):
+            yield {
+                'name': name,
+                'link': link,
+                'price': price,
+            }
+
+class HacomSpider(scrapy.Spider):
+    name = 'hacom'
+    start_urls = ['https://hacom.vn/laptop']
+
+    custom_settings = {
+        'DOWNLOAD_DELAY': 1,
+        'CONCURRENT_REQUESTS': 1,
+        'ROBOTSTXT_OBEY': False,
+        'USER_AGENT': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.182 Safari/537.36',
+    }
+
+    def convert_price(self, price_txt):
+        price_txt = re.sub(r"[^\d]", "", price_txt)
+        if not re.search(r"\d", price_txt):
+            return 0
+        return int(price_txt)
+
+    def parse(self, response):
+        urls = [f'{response.url}/{i + 1}/' for i in range(10)]
+
+        for url in urls:
+            yield scrapy.Request(url, callback=self.parse_page)
+
+    def parse_page(self, response):
+        links = response.css('#159 div[data-pid] div.item-name a::attr(href)').getall()
+        names = response.css('#159 div[data-pid] div.item-name a::text').getall()
+        prices_txt = response.css('#159 div[data-pid] span.price-current::text').getall()
+
+        prices = [self.convert_price(price) for price in prices_txt]
+
+        for name, link, price in zip(names, links, prices):
+            yield {
+                'name': name,
+                'link': link,
+                'price': price,
+            }
+    def closed(self, reason):
+        self.browser.quit()
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
