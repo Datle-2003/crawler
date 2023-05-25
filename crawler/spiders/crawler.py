@@ -390,9 +390,10 @@ class NguyenKimSpider(scrapy.Spider):
                 'price': price,
             }
 
-class HacomSpider(scrapy.Spider):
-    name = 'hacom'
-    start_urls = ['https://hacom.vn/laptop']
+
+class GearVNSpider(scrapy.Spider):
+    name = 'gearvn'
+    start_urls = ['https://gearvn.com/pages/laptop-van-phong']
 
     custom_settings = {
         'DOWNLOAD_DELAY': 1,
@@ -408,17 +409,17 @@ class HacomSpider(scrapy.Spider):
         return int(price_txt)
 
     def parse(self, response):
-        urls = [f'{response.url}/{i + 1}/' for i in range(10)]
+        browser_links = response.css('#banchay div[class*="col-xl-2"] a::attr(href)').getall()
 
-        for url in urls:
-            yield scrapy.Request(url, callback=self.parse_page)
+        for browser_link in browser_links[:6]:
+            yield scrapy.Request(browser_link, callback=self.parse_page)
 
     def parse_page(self, response):
-        links = response.css('#159 div[data-pid] div.item-name a::attr(href)').getall()
-        names = response.css('#159 div[data-pid] div.item-name a::text').getall()
-        prices_txt = response.css('#159 div[data-pid] span.price-current::text').getall()
+        links = response.css('div.product-row a::attr(href)').getall()
+        names = response.css('div.product-row .product-row-name::text').getall()
+        prices = response.css('div.product-row .product-row-sale::text').getall()
 
-        prices = [self.convert_price(price) for price in prices_txt]
+        prices = [self.convert_price(price) for price in prices]
 
         for name, link, price in zip(names, links, prices):
             yield {
@@ -426,10 +427,8 @@ class HacomSpider(scrapy.Spider):
                 'link': link,
                 'price': price,
             }
-    def closed(self, reason):
+    def closed(self, reason):     
         self.browser.quit()
-        
-        
         
         
         
